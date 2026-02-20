@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fraud Shield India — Real-Time Scam Intelligence</title>
+    <meta name="description" content="AI-powered scam and fraud intelligence system for India. Report scams, check suspicious numbers, and analyze messages in real-time.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <!-- ═══════ SIDEBAR NAV ═══════ -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <div class="brand-icon">🛡️</div>
+            <div>
+                <h1 class="brand-title">Fraud Shield</h1>
+                <span class="brand-subtitle">By Aviral Dubey</span>
+            </div>
+        </div>
+
+        <div class="nav-links">
+            <a href="#dashboard" class="nav-link active" data-view="dashboard" id="nav-dashboard">
+                <span class="nav-icon">📊</span>
+                <span>Dashboard</span>
+            </a>
+            <a href="#report" class="nav-link" data-view="report" id="nav-report">
+                <span class="nav-icon">🚨</span>
+                <span>Report Scam</span>
+            </a>
+            <a href="#lookup" class="nav-link" data-view="lookup" id="nav-lookup">
+                <span class="nav-icon">🔍</span>
+                <span>Check Identifier</span>
+            </a>
+            <a href="#analyzer" class="nav-link" data-view="analyzer" id="nav-analyzer">
+                <span class="nav-icon">🤖</span>
+                <span>AI Analyzer</span>
+            </a>
+        </div>
+
+        <div class="sidebar-footer">
+            <div class="api-status" id="api-status">
+                <span class="status-dot"></span>
+                <span class="status-text">Connecting...</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══════ MOBILE TOP BAR ═══════ -->
+    <div class="mobile-topbar">
+        <button class="hamburger" id="hamburger" aria-label="Toggle menu">☰</button>
+        <span class="mobile-brand">🛡️ Fraud Shield</span>
+    </div>
+
+    <!-- ═══════ MAIN CONTENT ═══════ -->
+    <main class="main-content" id="main-content">
+
+        <!-- ── DASHBOARD VIEW ── -->
+        <section class="view active" id="view-dashboard">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Dashboard</h2>
+                    <p class="view-subtitle">Real-time fraud intelligence overview</p>
+                </div>
+                <button class="btn btn-ghost" onclick="loadDashboard()" id="refresh-dashboard">↻ Refresh</button>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon stat-total">📋</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-total">—</span>
+                        <span class="stat-label">Total Reports</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-unique">🎯</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-unique">—</span>
+                        <span class="stat-label">Unique Scammers</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-danger">⚠️</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-highrisk">—</span>
+                        <span class="stat-label">High Risk</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon stat-safe">✅</div>
+                    <div class="stat-info">
+                        <span class="stat-value" id="stat-categories">—</span>
+                        <span class="stat-label">Scam Types</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Row -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3 class="chart-title">Risk Distribution</h3>
+                    <div class="chart-body" id="risk-chart">
+                        <div class="chart-placeholder">No data yet</div>
+                    </div>
+                </div>
+                <div class="chart-card">
+                    <h3 class="chart-title">Scam Types</h3>
+                    <div class="chart-body" id="category-chart">
+                        <div class="chart-placeholder">No data yet</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Reports Table -->
+            <div class="table-card">
+                <h3 class="chart-title">Recent Reports</h3>
+                <div class="table-wrapper">
+                    <table class="data-table" id="recent-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Identifier</th>
+                                <th>Category</th>
+                                <th>Risk</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recent-tbody">
+                            <tr><td colspan="5" class="table-empty">No reports yet. Be the first to report a scam!</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- ── REPORT SCAM VIEW ── -->
+        <section class="view" id="view-report">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Report a Scam</h2>
+                    <p class="view-subtitle">Help protect others by reporting fraud</p>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <form id="report-form" onsubmit="submitReport(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="report-type">Identifier Type</label>
+                        <select class="form-select" id="report-type" name="identifier_type" required>
+                            <option value="">Select type...</option>
+                            <option value="phone">📱 Phone Number</option>
+                            <option value="upi">💳 UPI ID</option>
+                            <option value="website">🌐 Website / URL</option>
+                            <option value="email">📧 Email Address</option>
+                            <option value="other">📝 Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="report-identifier">Identifier Value</label>
+                        <input class="form-input" type="text" id="report-identifier" name="identifier_value"
+                               placeholder="e.g., +91 9876543210 or scammer@upi" required minlength="2">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="report-description">Description</label>
+                        <textarea class="form-textarea" id="report-description" name="description" rows="5"
+                                  placeholder="Describe what happened. Include any messages received, methods used, etc."
+                                  required minlength="10"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="report-name">Your Name (optional)</label>
+                        <input class="form-input" type="text" id="report-name" name="reporter_name"
+                               placeholder="Anonymous" maxlength="100">
+                    </div>
+
+                    <button class="btn btn-primary btn-lg" type="submit" id="report-submit-btn">
+                        <span class="btn-text">🛡️ Submit Report</span>
+                        <span class="btn-loader" style="display:none;">Analyzing...</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Report Result -->
+            <div class="result-card" id="report-result" style="display:none;">
+                <div id="report-result-content"></div>
+            </div>
+        </section>
+
+        <!-- ── CHECK IDENTIFIER VIEW ── -->
+        <section class="view" id="view-lookup">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">Check Identifier</h2>
+                    <p class="view-subtitle">Look up a phone number, UPI ID, or URL to check for fraud reports</p>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <form id="lookup-form" onsubmit="lookupIdentifier(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="lookup-input">Enter Identifier</label>
+                        <div class="search-bar">
+                            <input class="form-input search-input" type="text" id="lookup-input"
+                                   placeholder="Phone number, UPI ID, website, or email..." required minlength="2">
+                            <button class="btn btn-primary search-btn" type="submit" id="lookup-submit-btn">
+                                <span class="btn-text">🔍 Search</span>
+                                <span class="btn-loader" style="display:none;">Searching...</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Lookup Result -->
+            <div class="result-card" id="lookup-result" style="display:none;">
+                <div id="lookup-result-content"></div>
+            </div>
+        </section>
+
+        <!-- ── AI ANALYZER VIEW ── -->
+        <section class="view" id="view-analyzer">
+            <div class="view-header">
+                <div>
+                    <h2 class="view-title">AI Scam Analyzer</h2>
+                    <p class="view-subtitle">Paste a suspicious message for instant AI-powered analysis</p>
+                </div>
+            </div>
+
+            <div class="form-card">
+                <form id="analyzer-form" onsubmit="analyzeMessage(event)">
+                    <div class="form-group">
+                        <label class="form-label" for="analyzer-input">Suspicious Message</label>
+                        <textarea class="form-textarea" id="analyzer-input" rows="6"
+                                  placeholder="Paste the suspicious SMS, WhatsApp message, email, or any text you received..."
+                                  required minlength="5"></textarea>
+                    </div>
+
+                    <button class="btn btn-accent btn-lg" type="submit" id="analyzer-submit-btn">
+                        <span class="btn-text">🤖 Analyze with AI</span>
+                        <span class="btn-loader" style="display:none;">AI is analyzing...</span>
+                    </button>
+                </form>
+            </div>
+
+            <!-- Analysis Result -->
+            <div class="result-card" id="analyzer-result" style="display:none;">
+                <div id="analyzer-result-content"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ═══════ TOAST CONTAINER ═══════ -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>
